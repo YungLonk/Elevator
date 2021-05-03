@@ -1,8 +1,18 @@
-# After making a floor request, must wait 10 seconds for door to begin closing, 2 seconds for the door to shut, and 5 seconds travel time per floor #
-# Can prematurely close door during 10 second wait time with no consequences by typing "close door" after requesting floor #
-# Can hold door open 5 seconds longer during 10 second wait time by typing "hold door" after requesting floor #
-# Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel #
+# Time separations:
+#     10 seconds before beginning to close door (after requesting one floor)
+#        This turns into 5 seconds if requesting another floor
+#     2 seconds to close the door
+#     5 seconds to travel to each floor
+#     4 seconds for door to stay open after arriving (when another floor is requested)
+#     5 second extension for beginning to close the door by typing 'hold door'
+
+# Can prematurely close door during 10 second wait time by typing "close door" after requesting floor #
 # There are 5 floors in this building. #
+# Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel #
+"""
+The above is being worked on for efficient travel, but it does currently travel
+to the first requested floor, then to the second requested floor
+"""
 
 # Modules
 from time import sleep
@@ -17,9 +27,9 @@ def howToUse():
 def reqFloor(): # Receives and returns user's input
     return input("Which floor do you need?: ")
 
-def closeDoor(): # Can be interrupted
-    print("Closing door in 10 seconds...")
-    sleep(10)
+def closeDoor(sec): # Can be interrupted
+    print(f"Closing door in {sec} seconds...")
+    sleep(sec)
 
 def isValidFloor(floorNum): # Makes sure the number provided is anywhere from 1 to 5 (inclusive)
     if floorNum < 1 or floorNum > 5:
@@ -63,6 +73,7 @@ def floorReq(floorNeeded, currentFloor): # Sends user to appropriate floor
 
 # This function takes two floor requests
 def doubleFloorReq(floorNeeded1, floorNeeded2, currentFloor):
+    closeDoor(5)
     print("Closing doors...")
     sleep(2)
     while currentFloor != floorNeeded1:
@@ -96,7 +107,7 @@ def main():
                     continue
                 else: # Now all is well. Continue with the program.
                     try: # Only one floor request
-                        closeDoor()
+                        closeDoor(10)
                         currentFloor = floorReq(intFloor, currentFloor)
                         floor = reqFloor()
                     except KeyboardInterrupt: # If user hits 'ctrl + c'...
