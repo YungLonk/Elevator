@@ -3,12 +3,13 @@
 #        This turns into 5 seconds if requesting another floor
 #     2 seconds to close the door
 #     5 seconds to travel to each floor
-#     4 seconds for door to stay open after arriving (when another floor is requested)
-#     5 second extension for beginning to close the door by typing 'hold door'
-
-# Can prematurely close door during 10 second wait time by typing "close door" after requesting floor #
-# There are 5 floors in this building. #
-# Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel #
+#     2 seconds to open door
+#     4 seconds to hold door when second floor requested
+#     +5 seconds before closing the doors by typing 'hold door'
+#
+# Can prematurely close door during 10 second wait time by typing "close door" after requesting floor 
+# There are 5 floors in this building. 
+# Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel 
 """
 The above is being worked on for efficient travel, but it does currently travel
 to the first requested floor, then to the second requested floor
@@ -19,7 +20,6 @@ from time import sleep
 
 # Functions
 def howToUse():
-    print("")
     print("Enter the floor you need when prompted.")
     print("If you need 2 floors, hit 'ctrl + c', and enter when prompted.")
     print("")
@@ -27,9 +27,17 @@ def howToUse():
 def reqFloor(): # Receives and returns user's input
     return input("Which floor do you need?: ")
 
-def closeDoor(sec): # Can be interrupted
-    print(f"Closing door in {sec} seconds...")
-    sleep(sec)
+def closeDoor(sec=2): # Closes the doors
+    if sec == 2:
+        print(f"Closing doors...")
+        sleep(2)
+    else: # Overload: This part can be interrupted
+        print(f"Closing doors in {sec} seconds...")
+        sleep(sec)
+
+def openDoor(currentFloor):
+    print(f"Arrived at floor {currentFloor}; Opening doors...")
+    sleep(2)
 
 def isValidFloor(floorNum): # Makes sure the number provided is anywhere from 1 to 5 (inclusive)
     if floorNum < 1 or floorNum > 5:
@@ -61,31 +69,27 @@ def switchingFloors(currentFloor, floorNeeded): # Sends elevator to floor needed
             currentFloor -= 1
     return currentFloor
 
-# This function takes one floor request
-def floorReq(floorNeeded, currentFloor): # Sends user to appropriate floor
-    print("Closing doors...")
-    sleep(2)
-    while currentFloor != floorNeeded:
-        currentFloor = switchingFloors(currentFloor, floorNeeded)
-    else:
-        print("You have arrived at floor", currentFloor)
-    return currentFloor
+def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
+    if floorNeeded2 == None: # One floor request
+        closeDoor()
+        while currentFloor != floorNeeded:
+            currentFloor = switchingFloors(currentFloor, floorNeeded)
+        else:
+            print(f"You have arrived at floor {currentFloor}.")
+        return currentFloor
 
-# This function takes two floor requests
-def doubleFloorReq(floorNeeded1, floorNeeded2, currentFloor):
-    closeDoor(5)
-    print("Closing doors...")
-    sleep(2)
-    while currentFloor != floorNeeded1:
-        currentFloor = switchingFloors(currentFloor, floorNeeded1)
-    else:
-        print("Arrived at floor", currentFloor,"; opening doors...")
-        sleep(4)
+    else: # Two floor reqeusts
+        closeDoor(2)
         print("Closing doors...")
         sleep(2)
-        currentFloor = switchingFloors(currentFloor, floorNeeded2)
-    print("You have arrived at floor", currentFloor,".")
-    return currentFloor
+        while currentFloor != floorNeeded:
+            currentFloor = switchingFloors(currentFloor, floorNeeded)
+        else:
+            openDoor(currentFloor)
+            closeDoor()
+            currentFloor = switchingFloors(currentFloor, floorNeeded2)
+        print("You have arrived at floor", currentFloor,".")
+        return currentFloor
 
 def main():
     howToUse()
