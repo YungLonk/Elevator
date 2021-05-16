@@ -49,39 +49,34 @@ def efficientTravel(currentFloor, floorNeeded1, floorNeeded2):
     current2Difference = currentFloor - floorNeeded2
     oneCurrentDifference = floorNeeded1 - currentFloor
     twoCurrentDifference = floorNeeded2 - currentFloor
-    if (current1Difference < 0) and (current2Difference < 0): # If current floor is lower than both requested floors...
-
+    if (current1Difference < 0) and (current2Difference < 0): # If current floor is lower than both requested floors
         if abs(oneCurrentDifference) > abs(twoCurrentDifference): # If the first requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1) #... go to second requested floor first
+            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1) # ...go to second requested floor first
             return currentFloor
-        elif twoCurrentDifference > oneCurrentDifference: # If the second requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2)#... go to first requested floor first
+        elif abs(oneCurrentDifference) < abs(twoCurrentDifference): # Otherwise...
+            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2)# ...go to first requested floor first
             return currentFloor
 
-    elif (current1Difference > 0) and (current2Difference > 0): # If currentFloor is greater than both requested floors
-
+    elif (current1Difference > 0) and (current2Difference > 0): # If currentFloor is higher than both requested floors
         if abs(current1Difference) > abs(current2Difference): # If the first requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1) #... go to second requested floor first
+            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1) # ...go to second requested floor first
             return currentFloor
-        elif abs(current1Difference) < abs(current2Difference): # If the second requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2) #... go to first requested floor first
+        elif abs(current1Difference) < abs(current2Difference): # Otherwise...
+            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2) # ...go to first requested floor first
             return currentFloor
     
-    # currentFloor: 4
-    # floorNeeded1: 2
-    # floorNeeded2: 5
-    elif (current1Difference > 0) and (current2Difference < 0): # If currentFloor greater than floorNeeded1 but not than floorNeeded2
+    elif (current1Difference > 0) and (current2Difference < 0): # If currentFloor higher than floorNeeded1 but not than floorNeeded2
         if abs(current1Difference) > abs(twoCurrentDifference): # If the first requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1)#... go to second requested floor first
+            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1)# ...go to second requested floor first
             return currentFloor
-        elif abs(current1Difference) < abs(twoCurrentDifference): # If the second requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2)#... go to first requested floor first
+        elif abs(current1Difference) < abs(twoCurrentDifference): # Otherwise...
+            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2)# ...go to first requested floor first
             return currentFloor
 
-    elif (current1Difference < 0) and (current2Difference > 0): # If currentFloor less than floorNeeded1 but not than floorNeeded2
+    elif (current1Difference < 0) and (current2Difference > 0): # If currentFloor lower than floorNeeded1 but not than floorNeeded2
         if abs(oneCurrentDifference) > abs(current2Difference): # If the first requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1)
+            currentFloor = execute(currentFloor, floorNeeded2, floorNeeded1)# ...go to second requested floor first
             return currentFloor
-        elif abs(oneCurrentDifference) < abs(current2Difference): # If the second requested floor is farther away...
-            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2)
+        elif abs(oneCurrentDifference) < abs(current2Difference): # Otherwise...
+            currentFloor = execute(currentFloor, floorNeeded1, floorNeeded2) # ...go to first requested floor first
             return currentFloor
