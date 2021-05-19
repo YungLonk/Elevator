@@ -3,17 +3,13 @@
 #        This turns into 5 seconds if requesting another floor
 #     2 seconds to close the door
 #     5 seconds to travel to each floor
-#     2 seconds to open door
-#     4 seconds to hold door when second floor requested
-#     +5 seconds before closing the doors by typing 'hold door'
+#     4 seconds to open door
+#     4 seconds to hold door when second floor requested (after hitting ctrl + c)
+#     +5 seconds before closing the doors by typing 'hold door' (after hitting ctrl + c)
 #
 # Can prematurely close door during 10 second wait time by typing "close door" after requesting floor 
 # There are 5 floors in this building. 
 # Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel 
-"""
-The above is being worked on for efficient travel, but it does currently travel
-to the first requested floor, then to the second requested floor
-"""
 
 # Modules
 from time import sleep
