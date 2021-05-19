@@ -92,7 +92,7 @@ def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
             openDoor(currentFloor)
             closeDoor()
             currentFloor = switchingFloors(currentFloor, floorNeeded2)
-        print(f"You have arrived at floor {currentFloor}.")
+        openDoor(currentFloor)
     return currentFloor
 
 def main():
