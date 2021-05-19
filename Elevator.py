@@ -76,6 +76,43 @@ def switchingFloors(currentFloor, floorNeeded): # Sends elevator to floor needed
             currentFloor -= 1
     return currentFloor
 
+def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2):
+    global current1Dif, current2Dif
+    current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
+    current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
+    below2Above1 = (current1Dif > 0) and (current2Dif < 0)
+    below1Above2 = (current1Dif < 0) and (current2Dif > 0)
+    if not below1Above2 and not below2Above1: # If floors needed not opposite directions from current floor
+        return False
+    else:
+        return True
+
+def inOrder(currentFloor, floorNeeded, floorNeeded2):
+    closeDoor()
+    while currentFloor != floorNeeded:
+        currentFloor = switchingFloors(currentFloor, floorNeeded)
+    else:
+        openDoor(currentFloor)
+        closeDoor()
+        currentFloor = switchingFloors(currentFloor, floorNeeded2)
+    openDoor(currentFloor)
+    return currentFloor
+
+def efficient(currentFloor, floorNeeded, floorNeeded2):
+    oneCurrentDif = floorNeeded - currentFloor
+    twoCurrentDif = floorNeeded2 - currentFloor
+    if (current1Dif < 0) and (current2Dif < 0):
+        if oneCurrentDif > twoCurrentDif:
+            currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
+        elif oneCurrentDif < twoCurrentDif:
+            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+    elif (current1Dif > 0) and (current2Dif > 0):
+        if current1Dif > current2Dif:
+            currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
+        elif current1Dif < current2Dif:
+            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+    return currentFloor
+
 def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
     if floorNeeded2 == None: # One floor request
         closeDoor()
@@ -86,13 +123,12 @@ def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
 
     else: # Two floor reqeusts
         closeDoor()
-        while currentFloor != floorNeeded:
-            currentFloor = switchingFloors(currentFloor, floorNeeded)
+        are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2)
+        if not are:
+            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
         else:
-            openDoor(currentFloor)
-            closeDoor()
-            currentFloor = switchingFloors(currentFloor, floorNeeded2)
-        openDoor(currentFloor)
+            currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2)
+        
     return currentFloor
 
 def main():
@@ -106,10 +142,6 @@ def main():
             if isWord: # ...check for any letters...
                 print("Enter either a floor number (1 - 5), or enter 'quit'.")
                 print("")
-                keepGoing = True
-                continue
-            if not isValidNumber(floor):# ...and make sure it's a number.
-                print("Enter either a floor number (1 - 5), or enter 'quit'.")
                 keepGoing = True
                 continue
             else: # If it is a number...
