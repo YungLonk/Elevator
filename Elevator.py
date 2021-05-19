@@ -17,6 +17,7 @@ to the first requested floor, then to the second requested floor
 
 # Modules
 from time import sleep
+from re import search
 
 # Functions
 def howToUse():
@@ -37,7 +38,7 @@ def closeDoor(sec=2): # Closes the doors
 
 def openDoor(currentFloor):
     print(f"Arrived at floor {currentFloor}; Opening doors...")
-    sleep(2)
+    sleep(4)
 
 def isValidFloor(floorNum): # Makes sure the number provided is anywhere from 1 to 5 (inclusive)
     if floorNum < 1 or floorNum > 5:
@@ -51,7 +52,13 @@ def isValidWord(word): # Makes sure the word provided is the word "quit"
     else:
         return True
 
-def isValidNumber(num):
+def isWord(word):
+    if not str.isalpha(word):
+        return False
+    else:
+        return True
+
+def isValidNumber(num): # Makes sure input is a number
     if not int(num):
         return False
     else:
@@ -76,29 +83,32 @@ def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
             currentFloor = switchingFloors(currentFloor, floorNeeded)
         else:
             print(f"You have arrived at floor {currentFloor}.")
-        return currentFloor
 
     else: # Two floor reqeusts
-        closeDoor(2)
-        print("Closing doors...")
-        sleep(2)
+        closeDoor()
         while currentFloor != floorNeeded:
             currentFloor = switchingFloors(currentFloor, floorNeeded)
         else:
             openDoor(currentFloor)
             closeDoor()
             currentFloor = switchingFloors(currentFloor, floorNeeded2)
-        print("You have arrived at floor", currentFloor,".")
-        return currentFloor
+        print(f"You have arrived at floor {currentFloor}.")
+    return currentFloor
 
 def main():
     howToUse()
     keepGoing = True
+    currentFloor = 1
     while keepGoing:
         floor = reqFloor() # Receive user input
-        currentFloor = 1
         if not isValidWord(floor): # While input is not the word quit...
-            if not isValidNumber(floor):# ...make sure it's a number.
+            isWord = search('[a-zA-Z]', floor)
+            if isWord: # ...check for any letters...
+                print("Enter either a floor number (1 - 5), or enter 'quit'.")
+                print("")
+                keepGoing = True
+                continue
+            if not isValidNumber(floor):# ...and make sure it's a number.
                 print("Enter either a floor number (1 - 5), or enter 'quit'.")
                 keepGoing = True
                 continue
@@ -112,12 +122,11 @@ def main():
                 else: # Now all is well. Continue with the program.
                     try: # Only one floor request
                         closeDoor(10)
-                        currentFloor = floorReq(intFloor, currentFloor)
-                        floor = reqFloor()
+                        currentFloor = floorReq(currentFloor, intFloor)
                     except KeyboardInterrupt: # If user hits 'ctrl + c'...
                         floor2 = reqFloor() # ...receive the 2nd request...
                         intFloor2 = int(floor2)
-                        currentFloor = doubleFloorReq(intFloor, intFloor2, currentFloor) #...and fulfill it.
+                        currentFloor = floorReq(currentFloor, intFloor, intFloor2) #...and fulfill it.
         else:
             print("Elevator shutting down...")
             keepGoing = False
