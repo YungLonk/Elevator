@@ -15,7 +15,7 @@
 from time import sleep
 from re import search
 
-# Functions
+# Helper Functions
 def howToUse():
     print("Enter the floor you need when prompted.")
     print("If you need 2 floors, hit 'ctrl + c', and enter when prompted.")
@@ -60,6 +60,7 @@ def isValidNumber(num): # Makes sure input is a number
     else:
         return True
 
+# Processing Functions
 def switchingFloors(currentFloor, floorNeeded): # Sends elevator to floor needed and returns the current floor
     while currentFloor < floorNeeded:
         print("Currently at floor", currentFloor,". Going up...")
@@ -115,18 +116,18 @@ def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
         while currentFloor != floorNeeded:
             currentFloor = switchingFloors(currentFloor, floorNeeded)
         else:
-            print(f"You have arrived at floor {currentFloor}.")
+            openDoor(currentFloor)
 
     else: # Two floor reqeusts
-        closeDoor()
         are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2)
         if not are:
-            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
-        else:
             currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2)
+        else:
+            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
         
     return currentFloor
 
+# Main function
 def main():
     howToUse()
     keepGoing = True
@@ -136,7 +137,7 @@ def main():
         if not isValidWord(floor): # While input is not the word quit...
             isWord = search('[a-zA-Z]', floor)
             if isWord: # ...check for any letters...
-                print("Enter either a floor number (1 - 5), or enter 'quit'.")
+                print("Enter either a floor number (1 - 5) or 'quit'.")
                 print("")
                 keepGoing = True
                 continue
