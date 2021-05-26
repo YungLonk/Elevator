@@ -73,16 +73,69 @@ def switchingFloors(currentFloor, floorNeeded): # Sends elevator to floor needed
             currentFloor -= 1
     return currentFloor
 
-def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2):
-    global current1Dif, current2Dif
+def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
+    global current1Dif, current2Dif, current3Dif, current4Dif
     current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
     current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
-    below2Above1 = (current1Dif > 0) and (current2Dif < 0)
-    below1Above2 = (current1Dif < 0) and (current2Dif > 0)
-    if not below1Above2 and not below2Above1: # If floors needed not opposite directions from current floor
-        return False
-    else:
-        return True
+    current3Dif = currentFloor - floorNeeded3 # Current floor above third floor needed
+    current4Dif = currentFloor - floorNeeded4 # Current floor above fourth floor needed
+    below1 = current1Dif < 0
+    above1 = current1Dif > 0
+    below2 = current2Dif < 0
+    above2 = current2Dif > 0
+    below3 = current3Dif < 0
+    above3 = current3Dif > 0
+    below4 = current4Dif < 0
+    above4 = current4Dif > 0
+
+    if (floorNeeded3 == None) and (floorNeeded4 == None): # 2 floors requested
+        below2Above1 = above1 and below2
+        below1Above2 = below1 and above2
+        if not below1Above2 and not below2Above1: # If floors needed not opposite directions from current floor
+            return False
+        else:
+            return True
+    
+    elif floorNeeded4 == None: # 3 floors requested (curFl: 1, flNd1: 3, flNd2: 2, flNd3: 5)
+        below1Below2Above3 = below1 and below2 and above3
+        below1Above2Below3 = below1 and above2 and below3
+        above1Below2Below3 = above1 and below2 and below3
+        below1Above2Above3 = below1 and above2 and above3
+        above1Above2Below3 = above1 and above2 and below3
+        above1Below2Above3 = above1 and below2 and above3
+        notBelowOrAbovePt1 = (not below1Below2Above3) and (not below1Above2Below3) and (not above1Below2Below3)
+        notBelowOrAbovePt2 = (not below1Above2Above3) and (not above1Above2Below3) and (not above1Below2Above3)
+
+        if notBelowOrAbovePt1 and notBelowOrAbovePt2: # If all floors in same direction (in order of request)
+            return False
+        else:
+            return True
+
+    else: # 4 floors requested
+        below1Below2Below3Above4 = below1 and below2 and below3 and above4
+        below1Below2Above3Below4 = below1 and below2 and above3 and below4
+        below1Above2Below3Below4 = below1 and above2 and below3 and below4
+        above1Below2Below3Below4 = above1 and below2 and below3 and below4
+        below1Below2Above3Above4 = below1 and below2 and above3 and above4
+        below1Above2Above3Below4 = below1 and above2 and above3 and below4
+        above1Above2Below3Below4 = above1 and above2 and below3 and below4
+        below1Above2Below3Above4 = below1 and above2 and below3 and above4
+        above1Below2Below3Above4 = above1 and below2 and below3 and above4
+        above1Below2Above3Below4 = above1 and below2 and above3 and below4
+        below1Above2Above3Above4 = below1 and above2 and above3 and above4
+        above1Below2Above3Above4 = above1 and below2 and above3 and above4
+        above1Above2Below3Above4 = above1 and above2 and below3 and above4
+        above1Above2Above3Below4 = above1 and above2 and above3 and below4
+
+        allInLinePt1 = (not below1Below2Below3Above4) and (not below1Below2Above3Below4) and (not below1Above2Below3Below4) and (not above1Below2Below3Below4)
+        allInLinePt2 = (not below1Below2Above3Above4) and (not below1Above2Above3Below4) and (not above1Above2Below3Below4)
+        allInLinePt3 = (not below1Above2Below3Above4) and (not above1Below2Below3Above4) and (not above1Below2Above3Below4)
+        allInLinePt4 = (not below1Above2Above3Above4) and (not above1Below2Above3Above4) and (not above1Above2Below3Above4) and (not above1Above2Above3Below4)
+
+        if (allInLinePt1) and (allInLinePt2) and (allInLinePt3) and (allInLinePt4):
+            return False
+        else:
+            return True
 
 def inOrder(currentFloor, floorNeeded, floorNeeded2):
     closeDoor()
@@ -95,37 +148,73 @@ def inOrder(currentFloor, floorNeeded, floorNeeded2):
     openDoor(currentFloor)
     return currentFloor
 
-def efficient(currentFloor, floorNeeded, floorNeeded2):
+def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
     oneCurrentDif = floorNeeded - currentFloor
     twoCurrentDif = floorNeeded2 - currentFloor
-    if (current1Dif < 0) and (current2Dif < 0):
-        if oneCurrentDif > twoCurrentDif:
-            currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
-        elif oneCurrentDif < twoCurrentDif:
-            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
-    elif (current1Dif > 0) and (current2Dif > 0):
-        if current1Dif > current2Dif:
-            currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
-        elif current1Dif < current2Dif:
-            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+    threeCurrentDif = floorNeeded3 - currentFloor
+
+    oneCurrCloser = oneCurrentDif < twoCurrentDif # If 1st requested floor closer, go there first
+    twoCurrCloser = oneCurrentDif > twoCurrentDif # If 2nd requested floor closer, go there first
+    if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
+        if (current1Dif < 0) and (current2Dif < 0): # If current floor beneath both requested floors
+            if twoCurrCloser:
+                currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
+            elif oneCurrCloser:
+                currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+
+        elif (current1Dif > 0) and (current2Dif > 0):# If current floor above both requested floors
+            if current1Dif > current2Dif: # If 2nd floor requested closer, go there first
+                currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
+            elif current1Dif < current2Dif: # If 1st floor requested closer, go there first
+                currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+
+    elif floorNeeded4 == None: # 3 floor requests
+        oneCurrClosest = oneCurrCloser and (oneCurrentDif < threeCurrentDif)
+        twoCurrClosest = twoCurrCloser and (twoCurrentDif < threeCurrentDif)
+        threeCurrClosest = (threeCurrentDif < oneCurrentDif) and (threeCurrentDif < twoCurrentDif)
+        if (current1Dif < 0) and (current2Dif < 0) and (current3Dif < 0): # If current floor beneath all requested floors
+            if oneCurrClosest:
+                
+        
     return currentFloor
 
-def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
-    if floorNeeded2 == None: # One floor request
+# def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
+#     if floorNeeded2 == None: # One floor request
+#         closeDoor()
+#         while currentFloor != floorNeeded:
+#             currentFloor = switchingFloors(currentFloor, floorNeeded)
+#         else:
+#             openDoor(currentFloor)
+# 
+#     else: # Two floor reqeusts
+#         are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2)
+#         if not are:
+#             currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2)
+#         else:
+#             currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+#         
+#     return currentFloor
+
+def floorReq(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, floorNeeded4=None):
+    if (floorNeeded2 == None) and (floorNeeded3 == None) and (floorNeeded4 == None): # 1 floor request
         closeDoor()
         while currentFloor != floorNeeded:
             currentFloor = switchingFloors(currentFloor, floorNeeded)
         else:
             openDoor(currentFloor)
 
-    else: # Two floor reqeusts
+    elif (floorNeeded3 == None) and (floorNeeded4 == None): # 2 floor requests
         are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2)
         if not are:
             currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2)
         else:
             currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
-        
-    return currentFloor
+
+    elif floorNeeded4 == None: # 3 floor requests
+        are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
+        if not are:
+            currentFloor = 
+
 
 # Main function
 def main():
