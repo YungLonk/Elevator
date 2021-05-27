@@ -15,16 +15,19 @@
 from time import sleep
 from re import search
 
-# Helper Functions
+# ----------------------------- Helper Functions ----------------------------- #
+# Describes how to use the program
 def howToUse():
     print("Enter the floor you need when prompted.")
     print("If you need 2 floors, hit 'ctrl + c', and enter when prompted.")
     print("")
 
-def reqFloor(): # Receives and returns user's input
+# Receives and returns user's input
+def reqFloor():
     return input("Which floor do you need?: ")
 
-def closeDoor(sec=2): # Closes the doors
+# Closes the door
+def closeDoor(sec=2):
     if sec == 2:
         print(f"Closing doors...")
         sleep(2)
@@ -32,36 +35,43 @@ def closeDoor(sec=2): # Closes the doors
         print(f"Closing doors in {sec} seconds...")
         sleep(sec)
 
+# Opens the door
 def openDoor(currentFloor):
     print(f"Arrived at floor {currentFloor}; Opening doors...")
     sleep(4)
 
-def isValidFloor(floorNum): # Makes sure the number provided is anywhere from 1 to 5 (inclusive)
+# Makes sure the number provided is anywhere from 1 to 5 (inclusive)
+def isValidFloor(floorNum):
     if floorNum < 1 or floorNum > 5:
         return False
     else:
         return True
 
-def isValidWord(word): # Makes sure the word provided is the word "quit"
+# Makes sure the word provided is the word "quit"
+def isValidWord(word):
     if word != "quit":
         return False
     else:
         return True
 
+# Checks for any letters in user's input
 def isWord(word):
     if not str.isalpha(word):
         return False
     else:
         return True
 
-def isValidNumber(num): # Makes sure input is a number
+# Makes sure input is a number
+def isValidNumber(num):
     if not int(num):
         return False
     else:
         return True
 
-# Processing Functions
-def switchingFloors(currentFloor, floorNeeded): # Sends elevator to floor needed and returns the current floor
+
+# ----------------------------- Processing Functions ----------------------------- #
+# Sends elevator to floor needed; returns the current floor
+def switchingFloors(currentFloor, floorNeeded):
     while currentFloor < floorNeeded:
         print("Currently at floor", currentFloor,". Going up...")
         sleep(5)
@@ -73,8 +83,7 @@ def switchingFloors(currentFloor, floorNeeded): # Sends elevator to floor needed
             currentFloor -= 1
     return currentFloor
 
-
-
+# Checks for floors in opposite directions relative to the currentFloor; Returns false or true
 def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
     # Describe position of a floor relative to the currentFloor (pt. 1)
     current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
@@ -145,36 +154,97 @@ def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=
         else:
             return True
 
-def inOrder(currentFloor, floorNeeded, floorNeeded2):
-    closeDoor()
-    while currentFloor != floorNeeded:
-        currentFloor = switchingFloors(currentFloor, floorNeeded)
-    else:
-        openDoor(currentFloor)
+# Operates the elevator (makes it move from floor to floor)
+def execute(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, floorNeeded4=None):
+    if floorNeeded2 == None and floorNeeded3 == None and floorNeeded4 == None: # 1 floor request
         closeDoor()
-        currentFloor = switchingFloors(currentFloor, floorNeeded2)
-    openDoor(currentFloor)
+        currentFloor = switchingFloors(currentFloor, floorNeeded)
+        openDoor(currentFloor)
+
+    if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
+        closeDoor()
+        while currentFloor != floorNeeded: # To the first requested floor...
+            currentFloor = switchingFloors(currentFloor, floorNeeded)
+        else:
+            openDoor(currentFloor)
+            closeDoor()
+            currentFloor = switchingFloors(currentFloor, floorNeeded2) # To the last requested floor
+        openDoor(currentFloor)
+
+    elif floorNeeded4 == None: # 3 floor requests
+        closeDoor()
+        while currentFloor != floorNeeded: # To the first requested floor...
+            currentFloor = switchingFloors(currentFloor, floorNeeded)
+        else:
+            openDoor(currentFloor)
+            closeDoor()
+        
+        while currentFloor != floorNeeded2: # To the second requested floor...
+            currentFloor = switchingFloors(currentFloor, floorNeeded2)
+        else:
+            openDoor(currentFloor)
+            closeDoor()
+            currentFloor = switchingFloors(currentFloor, floorNeeded3) # To the last requested floor
+        openDoor(currentFloor)
+
+    else: # 4 floor requests
+        closeDoor()
+        while currentFloor != floorNeeded: # To the first requested floor...
+            currentFloor = switchingFloors(currentFloor, floorNeeded)
+        else:
+            openDoor(currentFloor)
+            closeDoor()
+
+        while currentFloor != floorNeeded2: # To the second requested floor...
+            currentFloor = switchingFloors(currentFloor, floorNeeded2)
+        else:
+            openDoor(currentFloor)
+            closeDoor()
+
+        while currentFloor != floorNeeded3: # To the third requested floor...
+            currentFloor = switchingFloors(currentFloor, floorNeeded3)
+        else:
+            openDoor(currentFloor)
+            closeDoor()
+            currentFloor = switchingFloors(currentFloor, floorNeeded4) # To the last requested floor
+        openDoor(currentFloor)
     return currentFloor
 
 def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
-    oneCurrentDif = floorNeeded - currentFloor
-    twoCurrentDif = floorNeeded2 - currentFloor
-    threeCurrentDif = floorNeeded3 - currentFloor
+    # Describe position of a floor relative to the currentFloor (pt. 1)
+    current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
+    current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
+    current3Dif = currentFloor - floorNeeded3 # Current floor above third floor needed
+    current4Dif = currentFloor - floorNeeded4 # Current floor above fourth floor needed
+    oneCurrentDif = floorNeeded - currentFloor # Current floor below first floor needed
+    twoCurrentDif = floorNeeded2 - currentFloor # Current floor below second floor needed
+    threeCurrentDif = floorNeeded3 - currentFloor # Current floor below third floor needed
+    fourCurrentDif = floorNeeded4 - currentFloor # Current floor below fourth floor needed
+
+    # Describe position of a floor relative to the currentFloor (pt. 2)
+    below1 = current1Dif < 0
+    above1 = current1Dif > 0
+    below2 = current2Dif < 0
+    above2 = current2Dif > 0
+    below3 = current3Dif < 0
+    above3 = current3Dif > 0
+    below4 = current4Dif < 0
+    above4 = current4Dif > 0
 
     oneCurrCloser = oneCurrentDif < twoCurrentDif # If 1st requested floor closer, go there first
     twoCurrCloser = oneCurrentDif > twoCurrentDif # If 2nd requested floor closer, go there first
     if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
         if below1 and below2: # If current floor beneath both requested floors
             if twoCurrCloser:
-                currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
+                currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
             elif oneCurrCloser:
-                currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+                currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
 
         elif above1 and above2:# If current floor above both requested floors
             if current1Dif > current2Dif: # If 2nd floor requested closer, go there first
-                currentFloor = inOrder(currentFloor, floorNeeded2, floorNeeded)
+                currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
             elif current1Dif < current2Dif: # If 1st floor requested closer, go there first
-                currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+                currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
 
     elif floorNeeded4 == None: # 3 floor requests
         oneCurrClosest = oneCurrCloser and (oneCurrentDif < threeCurrentDif)
@@ -182,46 +252,37 @@ def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorN
         threeCurrClosest = (threeCurrentDif < oneCurrentDif) and (threeCurrentDif < twoCurrentDif)
         if below1 and below2 and below3: # If current floor beneath all requested floors
             if oneCurrClosest:
-                
+                print()
         
     return currentFloor
 
-# def floorReq(currentFloor, floorNeeded, floorNeeded2=None):
-#     if floorNeeded2 == None: # One floor request
-#         closeDoor()
-#         while currentFloor != floorNeeded:
-#             currentFloor = switchingFloors(currentFloor, floorNeeded)
-#         else:
-#             openDoor(currentFloor)
-# 
-#     else: # Two floor reqeusts
-#         are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2)
-#         if not are:
-#             currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2)
-#         else:
-#             currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
-#         
-#     return currentFloor
-
+# Either runs execute function directly (if floors are in opposite directions)
+#   or runs efficient function (if all needed floors are in one direction)
 def floorReq(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, floorNeeded4=None):
     if (floorNeeded2 == None) and (floorNeeded3 == None) and (floorNeeded4 == None): # 1 floor request
-        closeDoor()
-        while currentFloor != floorNeeded:
-            currentFloor = switchingFloors(currentFloor, floorNeeded)
-        else:
-            openDoor(currentFloor)
+        currentFloor = execute(currentFloor, floorNeeded)
 
     elif (floorNeeded3 == None) and (floorNeeded4 == None): # 2 floor requests
         are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2)
         if not are:
             currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2)
         else:
-            currentFloor = inOrder(currentFloor, floorNeeded, floorNeeded2)
+            currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
 
     elif floorNeeded4 == None: # 3 floor requests
         are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
         if not are:
-            currentFloor = 
+            currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
+        else:
+            currentFloor = execute(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
+
+    else: # 4 floor requests
+        are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
+        if not are:
+            currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
+        else:
+            currentFloor = execute(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
+    return currentFloor
 
 
 # Main function
@@ -272,5 +333,3 @@ def main():
         else:
             print("Elevator shutting down...")
             keepGoing = False
-
-main()
