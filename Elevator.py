@@ -101,54 +101,54 @@ def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=
     below4 = current4Dif < 0
     above4 = current4Dif > 0
 
-    # 2-floor-request scenario possible outcomes
-    below2Above1 = above1 and below2
-    below1Above2 = below1 and above2
+    # 2-floor-request scenario possible outcomes (a = Above; b = Below)
+    b2A1 = above1 and below2
+    b1A2 = below1 and above2
 
-    # 3-floor-request scenario possible outcomes
-    below1Below2Above3 = below1 and below2 and above3
-    below1Above2Below3 = below1 and above2 and below3
-    above1Below2Below3 = above1 and below2 and below3
-    below1Above2Above3 = below1 and above2 and above3
-    above1Above2Below3 = above1 and above2 and below3
-    above1Below2Above3 = above1 and below2 and above3
+    # 3-floor-request scenario possible outcomes (a = Above; b = Below)
+    b1B2A3 = below1 and below2 and above3
+    b1A2B3 = below1 and above2 and below3
+    a1B2B3 = above1 and below2 and below3
+    b1A2A3 = below1 and above2 and above3
+    a1A2B3 = above1 and above2 and below3
+    a1B2A3 = above1 and below2 and above3
 
-    # 4-floor-request scenario possible outcomes
-    below1Below2Below3Above4 = below1 and below2 and below3 and above4
-    below1Below2Above3Below4 = below1 and below2 and above3 and below4
-    below1Above2Below3Below4 = below1 and above2 and below3 and below4
-    above1Below2Below3Below4 = above1 and below2 and below3 and below4
-    below1Below2Above3Above4 = below1 and below2 and above3 and above4
-    below1Above2Above3Below4 = below1 and above2 and above3 and below4
-    above1Above2Below3Below4 = above1 and above2 and below3 and below4
-    below1Above2Below3Above4 = below1 and above2 and below3 and above4
-    above1Below2Below3Above4 = above1 and below2 and below3 and above4
-    above1Below2Above3Below4 = above1 and below2 and above3 and below4
-    below1Above2Above3Above4 = below1 and above2 and above3 and above4
-    above1Below2Above3Above4 = above1 and below2 and above3 and above4
-    above1Above2Below3Above4 = above1 and above2 and below3 and above4
-    above1Above2Above3Below4 = above1 and above2 and above3 and below4
+    # 4-floor-request scenario possible outcomes (a = Above; b = Below)
+    b1B2B3A4 = below1 and below2 and below3 and above4
+    b1B2A3B4 = below1 and below2 and above3 and below4
+    b1A2B3B4 = below1 and above2 and below3 and below4
+    a1B2B3B4 = above1 and below2 and below3 and below4
+    b1B2A3A4 = below1 and below2 and above3 and above4
+    b1A2A3B4 = below1 and above2 and above3 and below4
+    a1A2B3B4 = above1 and above2 and below3 and below4
+    b1A2B3A4 = below1 and above2 and below3 and above4
+    a1B2B3A4 = above1 and below2 and below3 and above4
+    a1B2A3B4 = above1 and below2 and above3 and below4
+    b1A2A3A4 = below1 and above2 and above3 and above4
+    a1B2A3A4 = above1 and below2 and above3 and above4
+    a1A2B3A4 = above1 and above2 and below3 and above4
+    a1A2A3B4 = above1 and above2 and above3 and below4
 
     # Acutal function
     if (floorNeeded3 == None) and (floorNeeded4 == None): # 2 floors requested
-        if (not below1Above2) and (not below2Above1): # If floors needed not opposite directions from current floor
+        if (not b1A2) and (not b2A1): # If floors needed not opposite directions from current floor
             return False
         else:
             return True
     
     elif floorNeeded4 == None: # 3 floors requested
-        notBelowOrAbovePt1 = (not below1Below2Above3) and (not below1Above2Below3) and (not above1Below2Below3)
-        notBelowOrAbovePt2 = (not below1Above2Above3) and (not above1Above2Below3) and (not above1Below2Above3)
+        notBelowOrAbovePt1 = (not b1B2A3) and (not b1A2B3) and (not a1B2B3)
+        notBelowOrAbovePt2 = (not b1A2A3) and (not a1A2B3) and (not a1B2A3)
         if notBelowOrAbovePt1 and notBelowOrAbovePt2:
             return False
         else:
             return True
 
     else: # 4 floors requested
-        allInLinePt1 = (not below1Below2Below3Above4) and (not below1Below2Above3Below4) and (not below1Above2Below3Below4) and (not above1Below2Below3Below4)
-        allInLinePt2 = (not below1Below2Above3Above4) and (not below1Above2Above3Below4) and (not above1Above2Below3Below4)
-        allInLinePt3 = (not below1Above2Below3Above4) and (not above1Below2Below3Above4) and (not above1Below2Above3Below4)
-        allInLinePt4 = (not below1Above2Above3Above4) and (not above1Below2Above3Above4) and (not above1Above2Below3Above4) and (not above1Above2Above3Below4)
+        allInLinePt1 = (not b1B2B3A4) and (not b1B2A3B4) and (not b1A2B3B4) and (not a1B2B3B4)
+        allInLinePt2 = (not b1B2A3A4) and (not b1A2A3B4) and (not a1A2B3B4)
+        allInLinePt3 = (not b1A2B3A4) and (not a1B2B3A4) and (not a1B2A3B4)
+        allInLinePt4 = (not b1A2A3A4) and (not a1B2A3A4) and (not a1A2B3A4) and (not a1A2A3B4)
         if (allInLinePt1) and (allInLinePt2) and (allInLinePt3) and (allInLinePt4):
             return False
         else:
@@ -210,6 +210,49 @@ def execute(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, flo
         openDoor(currentFloor)
     return currentFloor
 
+def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
+    # Describe position of a floor relative to the currentFloor (pt. 1)
+    current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
+    current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
+    current3Dif = currentFloor - floorNeeded3 # Current floor above third floor needed
+    current4Dif = currentFloor - floorNeeded4 # Current floor above fourth floor needed
+    oneCurrentDif = floorNeeded - currentFloor # Current floor below first floor needed
+    twoCurrentDif = floorNeeded2 - currentFloor # Current floor below second floor needed
+    threeCurrentDif = floorNeeded3 - currentFloor # Current floor below third floor needed
+    fourCurrentDif = floorNeeded4 - currentFloor # Current floor below fourth floor needed
+
+    # Describe position of a floor relative to the currentFloor (pt. 2)
+    below1 = current1Dif < 0
+    above1 = current1Dif > 0
+    below2 = current2Dif < 0
+    above2 = current2Dif > 0
+    below3 = current3Dif < 0
+    above3 = current3Dif > 0
+    below4 = current4Dif < 0
+    above4 = current4Dif > 0
+
+    if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
+        if below1 and below2: # If current floor beneath both requested floors
+            oneCurrCloser = oneCurrentDif < twoCurrentDif # 1st floor is closer
+            twoCurrCloser = oneCurrentDif > twoCurrentDif # 2nd floor is closer
+            if twoCurrCloser: # If 2nd requested floor closer, go there first
+                currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
+            elif oneCurrCloser: # If 1st requested floor closer, go there first
+                currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
+
+        elif above1 and above2:# If current floor above both requested floors
+            currOneCloser = current1Dif < current2Dif # 1st floor is closer
+            currTwoCloser = current1Dif > current2Dif # 2nd floor is closer
+            if currTwoCloser: # If 2nd floor requested closer, go there first
+                currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
+            elif currOneCloser: # If 1st floor requested closer, go there first
+                currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
+        
+    elif floorNeeded4 == None: # 3 floor requests
+        if below1 and below2 and below3: # If currentFloor beneath all requested floors
+            
+
+
 def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
     # Describe position of a floor relative to the currentFloor (pt. 1)
     current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
@@ -231,28 +274,39 @@ def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorN
     below4 = current4Dif < 0
     above4 = current4Dif > 0
 
-    oneCurrCloser = oneCurrentDif < twoCurrentDif # If 1st requested floor closer, go there first
-    twoCurrCloser = oneCurrentDif > twoCurrentDif # If 2nd requested floor closer, go there first
     if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
+
         if below1 and below2: # If current floor beneath both requested floors
-            if twoCurrCloser:
+            oneCurrCloser = oneCurrentDif < twoCurrentDif # 1st floor is closer
+            twoCurrCloser = oneCurrentDif > twoCurrentDif # 2nd floor is closer
+            if twoCurrCloser: # If 2nd requested floor closer, go there first
                 currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
-            elif oneCurrCloser:
+            elif oneCurrCloser: # If 1st requested floor closer, go there first
                 currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
 
         elif above1 and above2:# If current floor above both requested floors
-            if current1Dif > current2Dif: # If 2nd floor requested closer, go there first
+            currOneCloser = current1Dif < current2Dif # 1st floor is closer
+            currTwoCloser = current1Dif > current2Dif # 2nd floor is closer
+            if currTwoCloser: # If 2nd floor requested closer, go there first
                 currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
-            elif current1Dif < current2Dif: # If 1st floor requested closer, go there first
+            elif currOneCloser: # If 1st floor requested closer, go there first
                 currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
 
     elif floorNeeded4 == None: # 3 floor requests
-        oneCurrClosest = oneCurrCloser and (oneCurrentDif < threeCurrentDif)
-        twoCurrClosest = twoCurrCloser and (twoCurrentDif < threeCurrentDif)
-        threeCurrClosest = (threeCurrentDif < oneCurrentDif) and (threeCurrentDif < twoCurrentDif)
         if below1 and below2 and below3: # If current floor beneath all requested floors
-            if oneCurrClosest:
-                print()
+
+            # Find closest floor
+            oneCurrClosest = (oneCurrentDif < twoCurrentDif) and (oneCurrentDif < threeCurrentDif)
+            twoCurrClosest = (twoCurrentDif < oneCurrentDif) and (twoCurrentDif < threeCurrentDif)
+            threeCurrClosest = (threeCurrentDif < oneCurrentDif) and (threeCurrentDif < twoCurrentDif)
+
+            if oneCurrClosest: # If 1st floor closest...
+                twoCurrCloser = twoCurrentDif < threeCurrentDif
+                threeCurrCloser = twoCurrentDif > threeCurrentDif
+
+                if twoCurrCloser: # ...and 2nd floor next closest...
+                    currentFloor = execute(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
+                elif threeCurrCloser:
         
     return currentFloor
 
