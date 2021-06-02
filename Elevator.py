@@ -210,6 +210,7 @@ def execute(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, flo
         openDoor(currentFloor)
     return currentFloor
 
+# Returns floor closest to the currentFloor
 def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
     # Describe position of a floor relative to the currentFloor (pt. 1)
     current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
@@ -235,22 +236,30 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
         if below1 and below2: # If current floor beneath both requested floors
             oneCurrCloser = oneCurrentDif < twoCurrentDif # 1st floor is closer
             twoCurrCloser = oneCurrentDif > twoCurrentDif # 2nd floor is closer
-            if twoCurrCloser: # If 2nd requested floor closer, go there first
-                currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
-            elif oneCurrCloser: # If 1st requested floor closer, go there first
-                currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
+            if twoCurrCloser: # If 2nd requested floor closer, return it
+                return floorNeeded2
+            elif oneCurrCloser: # If 1st requested floor closer, return it
+                return floorNeeded
 
-        elif above1 and above2:# If current floor above both requested floors
+        elif above1 and above2: # If current floor above both requested floors
             currOneCloser = current1Dif < current2Dif # 1st floor is closer
             currTwoCloser = current1Dif > current2Dif # 2nd floor is closer
-            if currTwoCloser: # If 2nd floor requested closer, go there first
-                currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
-            elif currOneCloser: # If 1st floor requested closer, go there first
-                currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
+            if currTwoCloser: # If 2nd floor requested closer, return it
+                return floorNeeded2
+            elif currOneCloser: # If 1st floor requested closer, return it
+                return floorNeeded
         
     elif floorNeeded4 == None: # 3 floor requests
         if below1 and below2 and below3: # If currentFloor beneath all requested floors
-            
+            oneCurrClosest = (oneCurrentDif < twoCurrentDif) and (oneCurrentDif < threeCurrentDif)
+            twoCurrClosest = (twoCurrentDif < oneCurrentDif) and (twoCurrentDif < threeCurrentDif)
+            threeCurrClosest = (threeCurrentDif < oneCurrentDif) and (threeCurrentDif < twoCurrentDif)
+
+            if oneCurrClosest: # If floorNeeded is closest...
+                twoCurrCloser = twoCurrentDif < threeCurrentDif
+                threeCurrCloser = twoCurrentDif > threeCurrentDif
+                if twoCurrCloser: # ...and floorNeeded2 is 2nd closest...
+                    currentFloor = execute(currentFloor, floorNeeded)
 
 
 def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
@@ -279,17 +288,17 @@ def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorN
         if below1 and below2: # If current floor beneath both requested floors
             oneCurrCloser = oneCurrentDif < twoCurrentDif # 1st floor is closer
             twoCurrCloser = oneCurrentDif > twoCurrentDif # 2nd floor is closer
-            if twoCurrCloser: # If 2nd requested floor closer, go there first
+            if twoCurrCloser: # If 2nd requested floor closer, return it
                 currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
-            elif oneCurrCloser: # If 1st requested floor closer, go there first
+            elif oneCurrCloser: # If 1st requested floor closer, return it
                 currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
 
         elif above1 and above2:# If current floor above both requested floors
             currOneCloser = current1Dif < current2Dif # 1st floor is closer
             currTwoCloser = current1Dif > current2Dif # 2nd floor is closer
-            if currTwoCloser: # If 2nd floor requested closer, go there first
+            if currTwoCloser: # If 2nd floor requested closer, return it
                 currentFloor = execute(currentFloor, floorNeeded2, floorNeeded)
-            elif currOneCloser: # If 1st floor requested closer, go there first
+            elif currOneCloser: # If 1st floor requested closer, return it
                 currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
 
     elif floorNeeded4 == None: # 3 floor requests
