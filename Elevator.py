@@ -637,7 +637,7 @@ def main():
             try: # One floor request
                 closeDoor(10)
                 currentFloor = floorReq(currentFloor, intFloor)
-            except KeyboardInterrupt: # 2 floors on hitting 'ctrl + c'
+            except KeyboardInterrupt: # 2 floor requests
                 floor2 = input("Which other floor do you need?: ")
                 while not isValidUserInput(floor): # Keep trying if invalid input here
                     userError()
