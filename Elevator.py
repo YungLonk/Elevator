@@ -21,6 +21,11 @@ def howToUse():
     print("If you need more floors, hit 'ctrl + c', and enter when prompted. Repeat up to 3 times.")
     print("")
 
+# Prints user input error message
+def userError():
+    print("Enter either a floor number (1 - 5) or 'quit'.")
+    print("")
+
 # Closes the door
 def closeDoor(sec=2):
     if sec == 2:
@@ -213,7 +218,7 @@ def execute(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, flo
     return currentFloor
 
 # Returns list of floors needed in index order ([closestFloorNeeded, nextClosestFloorNeeded, etc.])
-def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
+def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None): # Needes to be DRYed up desperately
     if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
         # Describe position of a floor relative to the currentFloor #
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
@@ -587,6 +592,7 @@ def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorN
 # Either runs execute function directly (if floors are in opposite directions)
 #   or runs efficient function (if all needed floors are in one direction)
 def floorReq(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, floorNeeded4=None):
+
     if (floorNeeded2 == None) and (floorNeeded3 == None) and (floorNeeded4 == None): # 1 floor request
         currentFloor = execute(currentFloor, floorNeeded)
 
@@ -612,15 +618,19 @@ def floorReq(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, fl
             currentFloor = execute(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
     return currentFloor
 
+# -------------------- Main Function -------------------- #
 def main():
     howToUse()
     keepGoing = True
     while keepGoing:
         floor = input("Which floor do you need?: ") # Receive user input
         if not isValidUserInput(floor): # If invalid input, try again
-            print("Enter either a floor number (1 - 5) or 'quit'.")
-            print("")
+            userError()
             keepGoing = True
+            continue
+        elif floor == 'quit': # If input is the word 'quit', shut down the loop
+            print("Elevator shutting down...")
+            keepGoing = False
             continue
         else: # Is valid input
             intFloor = int(floor)
@@ -630,39 +640,29 @@ def main():
             except KeyboardInterrupt: # 2 floors on hitting 'ctrl + c'
                 floor2 = input("Which other floor do you need?: ")
                 while not isValidUserInput(floor): # Keep trying if invalid input here
-                    print("Enter either a floor number (1 - 5) or 'quit'.")
-                    print("")
+                    userError()
                     floor2 = input("Which other floor do you need?: ")
                 else:
-                    
-# Main function
-#def main():
-#    howToUse()
-#    keepGoing = True
-#    while keepGoing:
-#        floor = input("Which floor do you need?: ") # Receive user input
-#        if not isValidWord(floor): # While input is not the word quit...
-#            isWord = search('[a-zA-Z]', floor)
-#            if isWord: # ...check for any letters...
-#                print("Enter either a floor number (1 - 5) or 'quit'.")
-#                print("")
-#                keepGoing = True
-#                continue
-#            else: # If it is a number...
-#                intFloor = int(floor)
-#                if not isValidFloor(intFloor): # ...then make sure it's between 1 and 5 (inclusive)
-#                    print("Enter a valid floor number (1 - 5).")
-#                    print("")
-#                    keepGoing = True
-#                    continue
-#                else: # Now all is well. Continue with the program.
-#                    try: # Only one floor request
-#                        closeDoor(10)
-#                        currentFloor = floorReq(currentFloor, intFloor)
-#                    except KeyboardInterrupt: # If user hits 'ctrl + c', take 2nd request
-#                        floor2 = input("Which other floor do you need?: ")
-#                        intFloor2 = int(floor2)
-#                        currentFloor = floorReq(currentFloor, intFloor, intFloor2) #...and fulfill it.
-#        else:
-#            print("Elevator shutting down...")
-#            keepGoing = False
+                    intFloor2 = int(floor2)
+                    try:
+                        closeDoor(5)
+                        currentFloor = floorReq(currentFloor, intFloor, intFloor2)
+                    except KeyboardInterrupt: # 3rd floor request
+                        floor3 = input("Which other floor do you need?: ")
+                        while not isValidUserInput(floor3):
+                            userError()
+                            floor3 = input("Which other floor do you need?: ")
+                        else:
+                            intFloor3 = int(floor3)
+                            try:
+                                closeDoor(5)
+                                currentFloor = floorReq(currentFloor, intFloor, intFloor2, intFloor3)
+                            except KeyboardInterrupt: # 4th - and final - floor request
+                                floor4 = input("Which other floor do you need?: ")
+                                while not isValidUserInput(floor4):
+                                    userError()
+                                    floor4 = input("Which other floor do you need?: ")
+                                else:
+                                    intFloor4 = int(floor4)
+                                    closeDoor()
+                                    currentFloor = floorReq(currentFloor, intFloor, intFloor2, intFloor3, intFloor4)
