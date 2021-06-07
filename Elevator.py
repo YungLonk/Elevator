@@ -86,7 +86,6 @@ def isValidUserInput(userInput):
 
 
 # ----------------------------- Processing Functions ----------------------------- #
-
 # Sends elevator to floor needed; returns the current floor
 def switchingFloors(currentFloor, floorNeeded):
     while currentFloor < floorNeeded: # currentFloor beneath floorNeeded. Go up
@@ -197,7 +196,7 @@ def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=
         else:
             return True
 
-# Returns list of floors needed in index order ([closestFloorNeeded, nextClosestFloorNeeded, etc.])
+# Returns list of floors needed in order of closeness to currentFloor ([closestFloorNeeded, nextClosestFloorNeeded, etc.])
 def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None): # Needes to be DRYed up desperately
     if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
         # Describe position of a floor relative to the currentFloor #
