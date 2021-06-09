@@ -1,6 +1,4 @@
 # Time separations:
-#     10 seconds before beginning to close door (after requesting one floor)
-#        This turns into 5 seconds if requesting another floor
 #     2 seconds to close the door
 #     5 seconds to travel to each floor
 #     4 seconds to open door
@@ -54,13 +52,6 @@ def isValidWord(word):
     else:
         return True
 
-# Checks for any letters in user's input
-def isWord(word):
-    if not str.isalpha(word):
-        return False
-    else:
-        return True
-
 # Makes sure input is a number
 def isValidNumber(num):
     if not int(num):
@@ -74,6 +65,8 @@ def isValidUserInput(userInput):
         isWord = search("[A-Za-z]", userInput)
         if isWord:
             return False
+        elif userInput == "":
+            return True
         else:
             intInput = int(userInput)
             if not isValidFloor(intInput):
@@ -93,7 +86,7 @@ def switchingFloors(currentFloor, floorNeeded):
         sleep(5)
         currentFloor += 1
     else:
-        while currentFloor > floorNeeded: # currentFloor above floorNeede. Go down
+        while currentFloor > floorNeeded: # currentFloor above floorNeeded. Go down
             print(f"Currently at floor {currentFloor}. Going down...")
             sleep(5)
             currentFloor -= 1
@@ -597,6 +590,38 @@ def floorReq(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, fl
     return currentFloor
 
 # -------------------- Main Function -------------------- #
+
+def main2():
+    howToUse()
+    currentFloor = 1
+    keepGoing = True
+    while keepGoing:
+        floor = input("Which floor do you need?: ") # Receive first input
+        if not isValidUserInput(floor): # Make sure it's a floor number
+            userError()
+            keepGoing = True
+            continue
+        elif floor == 'quit': # ...or the word 'quit'
+            print("Elevator shutting down...")
+            keepGoing = False
+            continue
+        else: # Receive input and proceede
+            # Variables
+            floor2, floor3, floor4 = None # Initiate next inputs to NoneValue...
+            floors = [floor, floor2, floor3, floor4] # ...and make them iterable
+            intFloors = []
+
+            for floor in floors: # Receive input and change variable from NoneValue
+                floor = input("Which floor do you need? (hit enter if all floors requested): ")
+                while not isValidUserInput(floor):
+                    userError()
+                    floor = input("Which floor do you need? (hit enter if all floors requested): ")
+            for i in range(3): # Convert the input to integers
+                if floors[i] != "":
+                    intFloors[i] = int(floors[i])
+            intLen = len(intFloors)
+
+
 def main():
     howToUse()
     currentFloor = 1
