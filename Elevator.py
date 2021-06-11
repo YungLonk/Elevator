@@ -611,7 +611,7 @@ def main2():
             floors = [floor, floor2, floor3, floor4] # ...and make them iterable
             intFloors = []
 
-            for floor in floors: # Receive input and change variable from NoneValue
+            for floor in floors: # Receive input and change variable from NoneValue to empty string
                 floor = input("Which floor do you need? (hit enter if all floors requested): ")
                 while not isValidUserInput(floor):
                     userError()
@@ -620,7 +620,7 @@ def main2():
                 if floors[i] != "":
                     intFloors[i] = int(floors[i])
             intLen = len(intFloors)
-
+            
 
 def main():
     howToUse()
