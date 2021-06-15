@@ -6,64 +6,36 @@
 #
 # Can prematurely close door during 10 second wait time by typing "close door" after requesting floor 
 # There are 5 floors in this building. 
-# Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel 
+# Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel
+# All processing functions (except closestFloor and areOppositeDirections) return currentFloor
+#     to keep the elevator from resetting to 1st floor
 
 # Modules
 from HelperFunctions import *
 from time import sleep
-from re import search
 
 # ----------------------------- Processing Functions ----------------------------- #
-# Sends elevator to floor needed; returns the current floor
-def switchingFloors(currentFloor, floorNeeded):
-    while currentFloor < floorNeeded: # currentFloor beneath floorNeeded. Go up
-        print(f"Currently at floor {currentFloor}. Going up...")
-        sleep(5)
-        currentFloor += 1
-    else:
-        while currentFloor > floorNeeded: # currentFloor above floorNeeded. Go down
-            print(f"Currently at floor {currentFloor}. Going down...")
-            sleep(5)
-            currentFloor -= 1
-    return currentFloor
-
-# Makes elevator move
-def execute(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, floorNeeded4=None):
-    if floorNeeded2 == None and floorNeeded3 == None and floorNeeded4 == None: # 1 floor request
-        closeDoor()
-        currentFloor = switchingFloors(currentFloor, floorNeeded)
-        openDoor(currentFloor)
-    else: # create list for itteration; repeat code with each floor until reaching NoneValue
-        floorsNeeded = [floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4]
-        for floor in floorsNeeded: 
-            if floor == None: # If NoneValue reached, all other floors after will have NoneValue. break loop
-                break
-            else:
-                closeDoor()
-                currentFloor = switchingFloors(currentFloor, floor)
-                openDoor(currentFloor)
-    return currentFloor
-
-# Checks for floors in opposite directions relative to the currentFloor; Returns false or true
-def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
-    if (floorNeeded3 == None) and (floorNeeded4 == None): # 2 floors requested
+# Checks for floors in opposite directions relative to currentFloor; returns false or true
+def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
+    if len(floorsNeeded) == 0: # 2 floors contrasted
+        # Describe position of a floor relative to currentFloor #
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
         current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
         below1 = current1Dif < 0
         above1 = current1Dif > 0
         below2 = current2Dif < 0
         above2 = current2Dif > 0
-        b2A1 = above1 and below2
+        a1B2 = above1 and below2
         b1A2 = below1 and above2
-        if (not b1A2) and (not b2A1): # If floors needed not opposite directions from current floor
+        if (not b1A2) and (not a1B2): # If both floorsNeeded above or below currentFloor
             return False
         else:
             return True
     
-    elif floorNeeded4 == None: # 3 floors requested
+    elif len(floorsNeeded) == 1: # 3 floors compared
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
         current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
-        current3Dif = currentFloor - floorNeeded3 # Current floor above third floor needed
+        current3Dif = currentFloor - floorsNeeded[0] # Current floor above third floor needed
         below1 = current1Dif < 0
         above1 = current1Dif > 0
         below2 = current2Dif < 0
@@ -82,13 +54,13 @@ def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=
             return False
         else:
             return True
-
-    else: # 4 floors requested
+    
+    elif len(floorsNeeded) == 2: # 4 floors compared
         # Describe position of a floor relative to the currentFloor
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
         current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
-        current3Dif = currentFloor - floorNeeded3 # Current floor above third floor needed
-        current4Dif = currentFloor - floorNeeded4 # Current floor above fourth floor needed
+        current3Dif = currentFloor - floorsNeeded[0] # Current floor above third floor needed
+        current4Dif = currentFloor - floorsNeeded[1] # Current floor above fourth floor needed
         below1 = current1Dif < 0
         above1 = current1Dif > 0
         below2 = current2Dif < 0
@@ -124,9 +96,9 @@ def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=
         else:
             return True
 
-# Returns list of floors needed in order of closeness to currentFloor ([closestFloorNeeded, nextClosestFloorNeeded, etc.])
-def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None): # Needes to be DRYed up desperately
-    if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
+# Returns tuple ordered in closeness to currentFloor ((closestNeededFloor, nextClosestNeededFloor, ...))
+def closestFloor(currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
+    if len(floorsNeeded) == 0: # 2 floors contrasted
         # Describe position of a floor relative to the currentFloor #
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
         current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
@@ -141,20 +113,20 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
             oneCurrCloser = oneCurrentDif < twoCurrentDif # 1st floor is closer
             twoCurrCloser = oneCurrentDif > twoCurrentDif # 2nd floor is closer
             if twoCurrCloser: # If 2nd requested floor closer, return it
-                return [floorNeeded2, floorNeeded]
+                return (floorNeeded2, floorNeeded)
             elif oneCurrCloser: # If 1st requested floor closer, return it
-                return [floorNeeded, floorNeeded2]
+                return (floorNeeded, floorNeeded2)
 
         elif above1 and above2: # If current floor above both requested floors
             currOneCloser = current1Dif < current2Dif # 1st floor is closer
             currTwoCloser = current1Dif > current2Dif # 2nd floor is closer
             if currTwoCloser: # If 2nd floor requested closer, return it
-                return [floorNeeded2, floorNeeded]
+                return (floorNeeded2, floorNeeded)
             elif currOneCloser: # If 1st floor requested closer, return it
-                return [floorNeeded, floorNeeded2]
-
-        
-    elif floorNeeded4 == None: # 3 floor requests
+                return (floorNeeded, floorNeeded2)
+    
+    elif len(floorsNeeded) == 1: # 3 floors contrasted
+        floorNeeded3 = floorsNeeded[0]
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
         current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
         current3Dif = currentFloor - floorNeeded3 # Current floor above third floor needed
@@ -177,25 +149,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                 twoCurrCloser = twoCurrentDif < threeCurrentDif
                 threeCurrCloser = twoCurrentDif > threeCurrentDif
                 if twoCurrCloser: # floorNeeded2 is next closest
-                    return [floorNeeded, floorNeeded2, floorNeeded3]
+                    return (floorNeeded, floorNeeded2, floorNeeded3)
                 elif threeCurrCloser: # floorNeeded3 is next closest
-                    return [floorNeeded, floorNeeded3, floorNeeded2]
+                    return (floorNeeded, floorNeeded3, floorNeeded2)
 
             elif twoCurrClosest: # floorNeeded2 is closest
                 oneCurrCloser = oneCurrentDif < threeCurrentDif
                 threeCurrCloser = oneCurrentDif > threeCurrentDif
                 if oneCurrCloser: # floorNeeded is next closest
-                    return [floorNeeded2, floorNeeded, floorNeeded3]
+                    return (floorNeeded2, floorNeeded, floorNeeded3)
                 elif threeCurrCloser: # floorNeeded3 is next closest
-                    return [floorNeeded2, floorNeeded3, floorNeeded]
+                    return (floorNeeded2, floorNeeded3, floorNeeded)
 
             elif threeCurrClosest: # floorNeeded3 is closest
                 oneCurrCloser = oneCurrentDif < twoCurrentDif
                 twoCurrCloser = oneCurrentDif > twoCurrentDif
                 if oneCurrCloser: # floorNeeded is next closest
-                    return [floorNeeded3, floorNeeded, floorNeeded2]
+                    return (floorNeeded3, floorNeeded, floorNeeded2)
                 elif twoCurrCloser: # floorNeeded2 is next closest
-                    return [floorNeeded3, floorNeeded2, floorNeeded]
+                    return (floorNeeded3, floorNeeded2, floorNeeded)
         
         elif above1 and above2 and above3: # If currentFloor above all requested floors
             oneCurrClosest = (current1Dif < current2Dif) and (current1Dif < current3Dif)
@@ -206,28 +178,30 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                 twoCurrCloser = current2Dif < current3Dif
                 threeCurrCloser = current2Dif > current3Dif
                 if twoCurrCloser: # floorNeeded2 is next closest
-                    return [floorNeeded, floorNeeded2, floorNeeded3]
+                    return (floorNeeded, floorNeeded2, floorNeeded3)
                 elif threeCurrCloser: # floorNeeded3 is next closest
-                    return [floorNeeded, floorNeeded3, floorNeeded2]
+                    return (floorNeeded, floorNeeded3, floorNeeded2)
 
             elif twoCurrClosest: # floorNeeded2 is closest
                 oneCurrCloser = current1Dif < current3Dif
                 threeCurrCloser = current1Dif > current3Dif
                 if oneCurrCloser: # floorNeeded is next closest
-                    return [floorNeeded2, floorNeeded, floorNeeded3]
+                    return (floorNeeded2, floorNeeded, floorNeeded3)
                 elif threeCurrCloser: # floorNeeded3 is next closest
-                    return [floorNeeded2, floorNeeded3, floorNeeded]
+                    return (floorNeeded2, floorNeeded3, floorNeeded)
 
             elif threeCurrClosest: # floorNeeded3 is closest
                 oneCurrCloser = current1Dif < current2Dif
                 twoCurrCloser = current1Dif > current2Dif
                 if oneCurrCloser: # floorNeeded is next closest
-                    return [floorNeeded3, floorNeeded, floorNeeded2]
+                    return (floorNeeded3, floorNeeded, floorNeeded2)
                 elif twoCurrCloser: # floorNeeded2 is next closest
-                    return [floorNeeded3, floorNeeded2, floorNeeded]
+                    return (floorNeeded3, floorNeeded2, floorNeeded)
 
-    
-    else: # 4 floor requests
+    elif len(floorsNeeded) == 2: # 4 floors contrasted
+        floorNeeded3 = floorsNeeded[0]
+        floorNeeded4 = floorsNeeded[1]
+
         # Describe position of a floor relative to the currentFloor (pt. 1)
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
         current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
@@ -262,25 +236,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     threeCurrNext = threeCurrentDif < fourCurrentDif
                     fourCurrNext = threeCurrentDif > fourCurrentDif
                     if threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4]
+                        return (floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded, floorNeeded2, floorNeeded4, floorNeeded3]
+                        return (floorNeeded, floorNeeded2, floorNeeded4, floorNeeded3)
 
                 elif threeCurrCloser: # floorNeeded3 is 2nd closest
                     twoCurrNext = twoCurrentDif < fourCurrentDif
                     fourCurrNext = twoCurrentDif > fourCurrentDif
                     if twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded, floorNeeded3, floorNeeded2, floorNeeded4]
+                        return (floorNeeded, floorNeeded3, floorNeeded2, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded, floorNeeded3, floorNeeded4, floorNeeded2]
+                        return (floorNeeded, floorNeeded3, floorNeeded4, floorNeeded2)
 
                 elif fourCurrCloser: # floorNeeded4 is 2nd closest
                     twoCurrNext = twoCurrentDif < threeCurrentDif
                     threeCurrNext = twoCurrentDif > threeCurrentDif
                     if twoCurrNext:
-                        return [floorNeeded, floorNeeded4, floorNeeded2, floorNeeded3]
+                        return (floorNeeded, floorNeeded4, floorNeeded2, floorNeeded3)
                     elif threeCurrNext:
-                        return [floorNeeded, floorNeeded4, floorNeeded3, floorNeeded2]
+                        return (floorNeeded, floorNeeded4, floorNeeded3, floorNeeded2)
             
             elif twoCurrClosest: # floorNeeded2 is closest
                 oneCurrCloser = (oneCurrentDif < threeCurrentDif) and (oneCurrentDif < fourCurrentDif)
@@ -290,25 +264,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     threeCurrNext = threeCurrentDif < fourCurrentDif
                     fourCurrNext = threeCurrentDif > fourCurrentDif
                     if threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded2, floorNeeded, floorNeeded3, floorNeeded4]
+                        return (floorNeeded2, floorNeeded, floorNeeded3, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded2, floorNeeded, floorNeeded4, floorNeeded3]
+                        return (floorNeeded2, floorNeeded, floorNeeded4, floorNeeded3)
 
                 elif threeCurrCloser: # floorNeeded3 is 2nd closest
                     oneCurrNext = oneCurrentDif < fourCurrentDif
                     fourCurrNext = oneCurrentDif > fourCurrentDif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded2, floorNeeded3, floorNeeded, floorNeeded4]
+                        return (floorNeeded2, floorNeeded3, floorNeeded, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded2, floorNeeded3, floorNeeded4, floorNeeded]
+                        return (floorNeeded2, floorNeeded3, floorNeeded4, floorNeeded)
 
                 elif fourCurrCloser: # floorNeeded4 is 2nd closest
                     oneCurrNext = oneCurrentDif < threeCurrentDif
                     threeCurrNext = oneCurrentDif > threeCurrentDif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded2, floorNeeded4, floorNeeded, floorNeeded3]
+                        return (floorNeeded2, floorNeeded4, floorNeeded, floorNeeded3)
                     elif threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded2, floorNeeded4, floorNeeded3, floorNeeded]
+                        return (floorNeeded2, floorNeeded4, floorNeeded3, floorNeeded)
             
             elif threeCurrClosest: # floorNeeded3 is closest
                 oneCurrCloser = (oneCurrentDif < twoCurrentDif) and (oneCurrentDif < fourCurrentDif)
@@ -318,25 +292,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     twoCurrNext = twoCurrentDif < fourCurrentDif
                     fourCurrNext = twoCurrentDif > fourCurrentDif
                     if twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded3, floorNeeded, floorNeeded2, floorNeeded4]
+                        return (floorNeeded3, floorNeeded, floorNeeded2, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded3, floorNeeded, floorNeeded4, floorNeeded2]
+                        return (floorNeeded3, floorNeeded, floorNeeded4, floorNeeded2)
 
                 elif twoCurrCloser: # floorNeeded2 is 2nd closest
                     oneCurrNext = oneCurrentDif < fourCurrentDif
                     fourCurrNext = oneCurrentDif > fourCurrentDif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded3, floorNeeded2, floorNeeded, floorNeeded4]
+                        return (floorNeeded3, floorNeeded2, floorNeeded, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded3, floorNeeded2, floorNeeded4, floorNeeded]
+                        return (floorNeeded3, floorNeeded2, floorNeeded4, floorNeeded)
 
                 elif fourCurrCloser: # floorNeeded4 is 2nd closest
                     oneCurrNext = oneCurrentDif < twoCurrentDif
                     twoCurrNext = oneCurrentDif > twoCurrentDif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded3, floorNeeded4, floorNeeded, floorNeeded2]
+                        return (floorNeeded3, floorNeeded4, floorNeeded, floorNeeded2)
                     elif twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded3, floorNeeded4, floorNeeded2, floorNeeded]
+                        return (floorNeeded3, floorNeeded4, floorNeeded2, floorNeeded)
 
             elif fourCurrClosest: # floorNeeded4 is closest
                 oneCurrCloser = (oneCurrentDif < twoCurrentDif) and (oneCurrentDif < threeCurrentDif)
@@ -346,25 +320,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     twoCurrNext = twoCurrentDif < threeCurrentDif
                     threeCurrNext = twoCurrentDif > threeCurrentDif
                     if twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded4, floorNeeded, floorNeeded2, floorNeeded3]
+                        return (floorNeeded4, floorNeeded, floorNeeded2, floorNeeded3)
                     elif threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded4, floorNeeded, floorNeeded3, floorNeeded2]
+                        return (floorNeeded4, floorNeeded, floorNeeded3, floorNeeded2)
 
                 elif twoCurrCloser: # floorNeeded2 is 2nd closest
                     oneCurrNext = oneCurrentDif < threeCurrentDif
                     threeCurrNext = oneCurrentDif > threeCurrentDif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded4, floorNeeded2, floorNeeded, floorNeeded3]
+                        return (floorNeeded4, floorNeeded2, floorNeeded, floorNeeded3)
                     elif threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded4, floorNeeded2, floorNeeded3, floorNeeded]
+                        return (floorNeeded4, floorNeeded2, floorNeeded3, floorNeeded)
 
                 elif threeCurrCloser: # floorNeeded3 is 2nd closest
                     oneCurrNext = oneCurrentDif < twoCurrentDif
                     twoCurrNext = oneCurrentDif > twoCurrentDif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded4, floorNeeded3, floorNeeded, floorNeeded2]
+                        return (floorNeeded4, floorNeeded3, floorNeeded, floorNeeded2)
                     elif twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded4, floorNeeded3, floorNeeded2, floorNeeded]
+                        return (floorNeeded4, floorNeeded3, floorNeeded2, floorNeeded)
 
         elif above1 and above2 and above3 and above4: # currentFloor is above all floors needed
             oneCurrClosest = (current1Dif < current2Dif) and (current1Dif < current3Dif) and (current1Dif < current4Dif)
@@ -380,25 +354,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     threeCurrNext = current3Dif < current4Dif
                     fourCurrNext = current3Dif > current4Dif
                     if threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4]
+                        return (floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded, floorNeeded2, floorNeeded4, floorNeeded3]
+                        return (floorNeeded, floorNeeded2, floorNeeded4, floorNeeded3)
 
                 elif threeCurrCloser: # floorNeeded3 is 2nd closest
                     twoCurrNext = current2Dif < current4Dif
                     fourCurrNext = current2Dif > current4Dif
                     if twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded, floorNeeded3, floorNeeded2, floorNeeded4]
+                        return (floorNeeded, floorNeeded3, floorNeeded2, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded, floorNeeded3, floorNeeded4, floorNeeded2]
+                        return (floorNeeded, floorNeeded3, floorNeeded4, floorNeeded2)
 
                 elif fourCurrCloser: # floorNeeded4 is 2nd closest
                     twoCurrNext = current2Dif < current3Dif
                     threeCurrNext = current2Dif > current3Dif
                     if twoCurrNext:
-                        return [floorNeeded, floorNeeded4, floorNeeded2, floorNeeded3]
+                        return (floorNeeded, floorNeeded4, floorNeeded2, floorNeeded3)
                     elif threeCurrNext:
-                        return [floorNeeded, floorNeeded4, floorNeeded3, floorNeeded2]
+                        return (floorNeeded, floorNeeded4, floorNeeded3, floorNeeded2)
             
             elif twoCurrClosest: # floorNeeded2 is closest
                 oneCurrCloser = (current1Dif < current3Dif) and (current1Dif < current4Dif)
@@ -408,25 +382,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     threeCurrNext = current3Dif < current4Dif
                     fourCurrNext = current3Dif > current4Dif
                     if threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded2, floorNeeded, floorNeeded3, floorNeeded4]
+                        return (floorNeeded2, floorNeeded, floorNeeded3, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded2, floorNeeded, floorNeeded4, floorNeeded3]
+                        return (floorNeeded2, floorNeeded, floorNeeded4, floorNeeded3)
 
                 elif threeCurrCloser: # floorNeeded3 is 2nd closest
                     oneCurrNext = current1Dif < current4Dif
                     fourCurrNext = current1Dif > current4Dif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded2, floorNeeded3, floorNeeded, floorNeeded4]
+                        return (floorNeeded2, floorNeeded3, floorNeeded, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded2, floorNeeded3, floorNeeded4, floorNeeded]
+                        return (floorNeeded2, floorNeeded3, floorNeeded4, floorNeeded)
 
                 elif fourCurrCloser: # floorNeeded4 is 2nd closest
                     oneCurrNext = current1Dif < current3Dif
                     threeCurrNext = current1Dif > current3Dif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded2, floorNeeded4, floorNeeded, floorNeeded3]
+                        return (floorNeeded2, floorNeeded4, floorNeeded, floorNeeded3)
                     elif threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded2, floorNeeded4, floorNeeded3, floorNeeded]
+                        return (floorNeeded2, floorNeeded4, floorNeeded3, floorNeeded)
             
             elif threeCurrClosest: # floorNeeded3 is closest
                 oneCurrCloser = (current1Dif < current2Dif) and (current1Dif < current4Dif)
@@ -436,25 +410,25 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     twoCurrNext = current2Dif < current4Dif
                     fourCurrNext = current2Dif > current4Dif
                     if twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded3, floorNeeded, floorNeeded2, floorNeeded4]
+                        return (floorNeeded3, floorNeeded, floorNeeded2, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded3, floorNeeded, floorNeeded4, floorNeeded2]
+                        return (floorNeeded3, floorNeeded, floorNeeded4, floorNeeded2)
 
                 elif twoCurrCloser: # floorNeeded2 is 2nd closest
                     oneCurrNext = current1Dif < current4Dif
                     fourCurrNext = current1Dif > current4Dif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded3, floorNeeded2, floorNeeded, floorNeeded4]
+                        return (floorNeeded3, floorNeeded2, floorNeeded, floorNeeded4)
                     elif fourCurrNext: # floorNeeded4 is 2nd farthest
-                        return [floorNeeded3, floorNeeded2, floorNeeded4, floorNeeded]
+                        return (floorNeeded3, floorNeeded2, floorNeeded4, floorNeeded)
 
                 elif fourCurrCloser: # floorNeeded4 is 2nd closest
                     oneCurrNext = current1Dif < current2Dif
                     twoCurrNext = current1Dif > current2Dif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded3, floorNeeded4, floorNeeded, floorNeeded2]
+                        return (floorNeeded3, floorNeeded4, floorNeeded, floorNeeded2)
                     elif twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded3, floorNeeded4, floorNeeded2, floorNeeded]
+                        return (floorNeeded3, floorNeeded4, floorNeeded2, floorNeeded)
 
             elif fourCurrClosest: # floorNeeded4 is closest
                 oneCurrCloser = (current1Dif < current2Dif) and (current1Dif < current3Dif)
@@ -464,69 +438,95 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, flo
                     twoCurrNext = current2Dif < current3Dif
                     threeCurrNext = current2Dif > current3Dif
                     if twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded4, floorNeeded, floorNeeded2, floorNeeded3]
+                        return (floorNeeded4, floorNeeded, floorNeeded2, floorNeeded3)
                     elif threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded4, floorNeeded, floorNeeded3, floorNeeded2]
+                        return (floorNeeded4, floorNeeded, floorNeeded3, floorNeeded2)
 
                 elif twoCurrCloser: # floorNeeded2 is 2nd closest
                     oneCurrNext = current1Dif < current3Dif
                     threeCurrNext = current1Dif > current3Dif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded4, floorNeeded2, floorNeeded, floorNeeded3]
+                        return (floorNeeded4, floorNeeded2, floorNeeded, floorNeeded3)
                     elif threeCurrNext: # floorNeeded3 is 2nd farthest
-                        return [floorNeeded4, floorNeeded2, floorNeeded3, floorNeeded]
+                        return (floorNeeded4, floorNeeded2, floorNeeded3, floorNeeded)
 
                 elif threeCurrCloser: # floorNeeded3 is 2nd closest
                     oneCurrNext = current1Dif < current2Dif
                     twoCurrNext = current1Dif > current2Dif
                     if oneCurrNext: # floorNeeded is 2nd farthest
-                        return [floorNeeded4, floorNeeded3, floorNeeded, floorNeeded2]
+                        return (floorNeeded4, floorNeeded3, floorNeeded, floorNeeded2)
                     elif twoCurrNext: # floorNeeded2 is 2nd farthest
-                        return [floorNeeded4, floorNeeded3, floorNeeded2, floorNeeded]
+                        return (floorNeeded4, floorNeeded3, floorNeeded2, floorNeeded)
 
-def efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3=None, floorNeeded4=None):
-    if floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
+# Sends elevator to floor needed; returns the current floor
+def switchingFloors(currentFloor, floorNeeded):
+    while currentFloor < floorNeeded: # Current floor below floor needed. go up
+        print(f"Currently at floor {currentFloor}. Going up...")
+        sleep(5)
+        currentFloor += 1
+    else:
+        while currentFloor > floorNeeded: # Current floor above floor needed. go down
+            print(f"Currently at floor {currentFloor}. Going down...")
+            sleep(5)
+            currentFloor -= 1
+    return currentFloor
+
+# Makes elevator move
+def execute(currentFloor, floorNeeded, *floorsNeeded):
+    # Always at least one floor
+    closeDoor()
+    currentFloor = switchingFloors(currentFloor, floorNeeded)
+    openDoor(currentFloor)
+    if len(floorsNeeded) > 0: # If other floors needed, move to them
+        for floor in floorsNeeded:
+            closeDoor()
+            currentFloor = switchingFloors(currentFloor, floor)
+            openDoor(currentFloor)
+    return currentFloor
+
+# Runs execute function after sorting floors needed, going to each in sequential order
+def efficient(currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
+    if len(floorsNeeded) == 0: # 2 floor requests
         closest = closestFloor(currentFloor, floorNeeded, floorNeeded2)
         currentFloor = execute(currentFloor, closest[0], closest[1])
-    elif floorNeeded4 == None: # 3 floor requests
-        closest = closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
+    elif len(floorsNeeded) == 1: # 3 floor requests
+        closest = closestFloor(currentFloor, floorNeeded, floorNeeded2, floorsNeeded[0])
         currentFloor = execute(currentFloor, closest[0], closest[1], closest[2])
-    else: # 4 floor requests
-        closest = closestFloor(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
+    elif len(floorsNeeded) == 2: # 4 floor requests
+        closest = closestFloor(currentFloor, floorNeeded, floorNeeded2, floorsNeeded[0], floorsNeeded[1])
         currentFloor = execute(currentFloor, closest[0], closest[1], closest[2], closest[3])
     return currentFloor
 
 # Either runs execute function directly (if floors are in opposite directions)
 #   or runs efficient function (if all needed floors are in one direction)
-def floorReq(currentFloor, floorNeeded, floorNeeded2=None, floorNeeded3=None, floorNeeded4=None):
-    if floorNeeded2 == None and floorNeeded3 == None and floorNeeded4 == None: # 1 floor request
+def floorReq(currentFloor, floorNeeded, *floorsNeeded):
+    if len(floorsNeeded) == 0: # 1 floor request
         currentFloor = execute(currentFloor, floorNeeded)
 
-    elif floorNeeded3 == None and floorNeeded4 == None: # 2 floor requests
-        are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2)
+    elif len(floorsNeeded) == 1: # 2 floor requests
+        are = areOppositeDirections(currentFloor, floorNeeded, floorsNeeded[0])
         if not are:
-            currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2)
+            currentFloor = efficient(currentFloor, floorNeeded, floorsNeeded[0])
         else:
-            currentFloor = execute(currentFloor, floorNeeded, floorNeeded2)
+            currentFloor = execute(currentFloor, floorNeeded, floorsNeeded[0])
 
-    elif floorNeeded4 == None: # 3 floor requests
-        are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
+    elif len(floorsNeeded) == 2: # 3 floor requests
+        are = areOppositeDirections(currentFloor, floorNeeded, floorsNeeded[0], floorsNeeded[1])
         if not are:
-            currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
+            currentFloor = efficient(currentFloor, floorNeeded, floorsNeeded[0], floorsNeeded[1])
         else:
-            currentFloor = execute(currentFloor, floorNeeded, floorNeeded2, floorNeeded3)
-
-    else: # 4 floor requests
-        are = areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
+            currentFloor = execute(currentFloor, floorNeeded, floorsNeeded[0], floorsNeeded[1])
+    
+    elif len(floorsNeeded) == 3: # 4 floor requests
+        are = areOppositeDirections(currentFloor, floorNeeded, floorsNeeded[0], floorsNeeded[1], floorsNeeded[2])
         if not are:
-            currentFloor = efficient(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
+            currentFloor = efficient(currentFloor, floorNeeded, floorsNeeded[0], floorsNeeded[1], floorsNeeded[2])
         else:
-            currentFloor = execute(currentFloor, floorNeeded, floorNeeded2, floorNeeded3, floorNeeded4)
+            currentFloor = execute(currentFloor, floorNeeded, floorsNeeded[0], floorsNeeded[1], floorsNeeded[2])
     return currentFloor
 
 # -------------------- Main Function -------------------- #
-# Must assign different # of arguments to floorReq depending on what
-def main2():
+def main():
     howToUse()
     currentFloor = 1
     keepGoing = True
@@ -548,6 +548,10 @@ def main2():
 
             for floor in floors: # Receive input and change variable from NoneValue to empty string
                 floor = input("Which floor do you need? (hit enter if all floors requested): ")
+                while floor == 'quit':
+                    print("You already requested a floor. You must enter more now")
+                    print("")
+                    floor = input("Which floor do you need? (hit enter if all floors requested): ")
                 while not isValidUserInput(floor):
                     userError()
                     floor = input("Which floor do you need? (hit enter if all floors requested): ")
@@ -555,55 +559,13 @@ def main2():
                 if floors[i] != "":
                     intFloors[i] = int(floors[i])
             intLen = len(intFloors)
-            
-
-def main():
-    howToUse()
-    currentFloor = 1
-    keepGoing = True
-    while keepGoing:
-        floor = input("Which floor do you need?: ") # Receive user input
-        if not isValidUserInput(floor): # If invalid input, try again
-            userError()
-            keepGoing = True
-            continue
-        elif floor == 'quit': # If input is the word 'quit', shut down the loop
-            print("Elevator shutting down...")
-            keepGoing = False
-            continue
-        else: # Is valid input
-            intFloor = int(floor)
-            try: # One floor request
-                closeDoor(10)
-                currentFloor = floorReq(currentFloor, intFloor)
-            except KeyboardInterrupt: # 2 floor requests
-                floor2 = input("Which other floor do you need?: ")
-                while not isValidUserInput(floor): # Keep trying if invalid input here
-                    userError()
-                    floor2 = input("Which other floor do you need?: ")
-                else:
-                    intFloor2 = int(floor2)
-                    try:
-                        closeDoor(5)
-                        currentFloor = floorReq(currentFloor, intFloor, intFloor2)
-                    except KeyboardInterrupt: # 3rd floor request
-                        floor3 = input("Which other floor do you need?: ")
-                        while not isValidUserInput(floor3):
-                            userError()
-                            floor3 = input("Which other floor do you need?: ")
-                        else:
-                            intFloor3 = int(floor3)
-                            try:
-                                closeDoor(5)
-                                currentFloor = floorReq(currentFloor, intFloor, intFloor2, intFloor3)
-                            except KeyboardInterrupt: # 4th - and final - floor request
-                                floor4 = input("Which other floor do you need?: ")
-                                while not isValidUserInput(floor4):
-                                    userError()
-                                    floor4 = input("Which other floor do you need?: ")
-                                else:
-                                    intFloor4 = int(floor4)
-                                    closeDoor()
-                                    currentFloor = floorReq(currentFloor, intFloor, intFloor2, intFloor3, intFloor4)
+            if intLen == 1:
+                currentFloor = floorReq(currentFloor, intFloors[0])
+            elif intLen == 2:
+                currentFloor = floorReq(currentFloor, intFloors[0], intFloors[1])
+            elif intLen == 3:
+                currentFloor = floorReq(currentFloor, intFloors[0], intFloors[1], intFloors[2])
+            elif intLen == 4:
+                currentFloor = floorReq(currentFloor, intFloors[0], intFloors[1], intFloors[2], intFloors[3])
 
 main()

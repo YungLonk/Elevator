@@ -1,4 +1,5 @@
 from time import sleep
+from re import search
 
 # Describes how to use the program
 def howToUse():
