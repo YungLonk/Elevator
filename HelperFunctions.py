@@ -26,6 +26,11 @@ def openDoor(currentFloor):
     print(f"Arrived at floor {currentFloor}; Opening doors...")
     sleep(4)
 
+# Picks up the person
+def pickUp(currentFloor):
+    print(f"Picked up person from {currentFloor}.")
+    sleep(1)
+
 # Makes sure the number provided is anywhere from 1 to 5 (inclusive)
 def isValidFloor(floorNum):
     if floorNum < 1 or floorNum > 5:
