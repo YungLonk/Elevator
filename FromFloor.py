@@ -1,5 +1,5 @@
 # Necessary resources/modules
-from Elevator import switchingFloors, execute
+from Elevator import switchingFloors, execute, areOppositeDirections
 from HelperFunctions import *
 
 # currentFloor: 1, fromFloor: 1, floorNeeded: 3, fromFloor2: 4, floorNeeded2: 2
@@ -14,6 +14,3 @@ def efficient(currentFloor, fromFloor, fromFloor2, floorNeeded, floorNeeded2, fr
     noFloor3Or4 = (fromFloor3 == None) and (fromFloor4 == None)
     noFloor3Or4Needed = (floorNeeded3 == None) and (floorNeeded4 == None)
     if noFloor3Or4 and noFloor3Or4Needed: # 2 floor requests
-
-        if currentFloor == fromFloor or currentFloor == fromFloor2: # One floor requested from is currentFloor
-            
