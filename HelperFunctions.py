@@ -59,8 +59,6 @@ def isValidUserInput(userInput):
         isWord = search("[A-Za-z]", userInput)
         if isWord:
             return False
-        elif userInput == "":
-            return True
         else:
             intInput = int(userInput)
             if not isValidFloor(intInput):
