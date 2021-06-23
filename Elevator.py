@@ -110,9 +110,9 @@ def closestFloor(currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
         above2 = current2Dif > 0
 
         if below1 and below2: # If current floor beneath both requested floors
-            oneCurrCloser = oneCurrentDif < twoCurrentDif # 1st floor is closer
+            oneCurrCloser = oneCurrentDif < twoCurrentDif
             twoCurrCloser = oneCurrentDif > twoCurrentDif # 2nd floor is closer
-            if twoCurrCloser: # If 2nd requested floor closer, return it
+            if twoCurrCloser:
                 return (floorNeeded2, floorNeeded)
             elif oneCurrCloser: # If 1st requested floor closer, return it
                 return (floorNeeded, floorNeeded2)
@@ -568,4 +568,5 @@ def main():
             elif intLen == 4:
                 currentFloor = floorReq(currentFloor, intFloors[0], intFloors[1], intFloors[2], intFloors[3])
 
-main()
+if __name__ == '__main__':
+    main()
