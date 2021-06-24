@@ -545,19 +545,19 @@ def main():
             continue
         else:
             # Variables
-            floor2, floor3, floor4 = None, None, None # Initiate next inputs to NoneValue...
+            floor2, floor3, floor4 = "" # Initiate next inputs to NoneValue...
             floors = [floor, floor2, floor3, floor4] # ...and make them iterable
             intFloors = []
 
             for floor in floors: # Receive input and change variable from NoneValue to empty string
-                floor = input("Which floor do you need? (hit enter if all floors requested): ")
+                floor = elvtr.getUserInput()
                 while floor == 'quit':
                     print("You already requested a floor. You must enter more now")
                     print("")
-                    floor = input("Which floor do you need? (hit enter if all floors requested): ")
+                    floor = elvtr.getUserInput()
                 while not isValidUserInput(floor):
                     userError()
-                    floor = input("Which floor do you need? (hit enter if all floors requested): ")
+                    floor = elvtr.getUserInput()
             for i in range(3): # Convert the input to integers
                 if floors[i] != "":
                     intFloors[i] = int(floors[i])
