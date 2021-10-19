@@ -56,8 +56,8 @@ def isValidNumber(num):
 # Runs user input through all validation
 def isValidUserInput(userInput):
     if not isValidWord(userInput):
-        isWord = search("[A-Za-z]", userInput)
-        if isWord:
+        hasLetters = search("[A-Za-z]", userInput)
+        if hasLetters:
             return False
         elif userInput == "":
             return True

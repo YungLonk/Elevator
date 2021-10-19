@@ -1,5 +1,5 @@
 # Modules
-from re import DOTALL
+from re import search
 from HelperFunctions import *
 
 class Elvtr:
@@ -462,17 +462,16 @@ class Elvtr:
                         elif twoCurrNext: # floorNeeded2 is 2nd farthest
                             return (floorNeeded4, floorNeeded3, floorNeeded2, floorNeeded)
 
-    # Moves elevator up or down; changes currentFloor
-    def switchingFloors(self, currentFloor, floorNeeded):
-        while currentFloor < floorNeeded: # currentFloor below floorNeeded
-            print(f"Currently at floor {currentFloor}; Going up...")
-            sleep(5)
-            currentFloor += 1
-        else:
-            while currentFloor > floorNeeded: # currentFloor above floorNeeded
-                print(f"Currently at floor {currentFloor}; Going down...")
-                sleep(5)
-                currentFloor -= 1
+    def efficient(self, currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
+        if len(floorsNeeded) == 0: # 2 floor requests
+            closest = self.closestFloor(currentFloor, floorNeeded, floorNeeded2)
+            currentFloor = self.execute(currentFloor, closest[0], closest[1])
+        elif len(floorsNeeded) == 1: # 3 floor requests
+            closest = self.closestFloor(currentFloor, floorNeeded, floorNeeded2, floorsNeeded[0])
+            currentFloor = self.execute(currentFloor, closest[0], closest[1], closest[2])
+        elif len(floorsNeeded) == 2: # 4 floor requests
+            closest = self.closestFloor(currentFloor, floorNeeded, floorNeeded2, floorsNeeded[0], floorsNeeded[1])
+            currentFloor = self.execute(currentFloor, closest[0], closest[1], closest[2], closest[3])
         return currentFloor
     
     # Opens and closes door for elevator; calls switchingFloors to move elevator
@@ -487,18 +486,20 @@ class Elvtr:
                 openDoor(currentFloor)
         return currentFloor
     
-    def efficient(self, currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
-        if len(floorsNeeded) == 0: # 2 floor requests
-            closest = self.closestFloor(currentFloor, floorNeeded, floorNeeded2)
-            currentFloor = self.execute(currentFloor, closest[0], closest[1])
-        elif len(floorsNeeded) == 1: # 3 floor requests
-            closest = self.closestFloor(currentFloor, floorNeeded, floorNeeded2, floorsNeeded[0])
-            currentFloor = self.execute(currentFloor, closest[0], closest[1], closest[2])
-        elif len(floorsNeeded) == 2: # 4 floor requests
-            closest = self.closestFloor(currentFloor, floorNeeded, floorNeeded2, floorsNeeded[0], floorsNeeded[1])
-            currentFloor = self.execute(currentFloor, closest[0], closest[1], closest[2], closest[3])
-        return currentFloor
 
+    # Moves elevator up or down; changes currentFloor
+    def switchingFloors(self, currentFloor, floorNeeded):
+        while currentFloor < floorNeeded: # currentFloor below floorNeeded
+            print(f"Currently at floor {currentFloor}; Going up...")
+            sleep(5)
+            currentFloor += 1
+        else:
+            while currentFloor > floorNeeded: # currentFloor above floorNeeded
+                print(f"Currently at floor {currentFloor}; Going down...")
+                sleep(5)
+                currentFloor -= 1
+        return currentFloor
+        
     """
     Sends floor request. Either runs execute function directly (if floors are in opposite directions)
        or runs efficient function (if all needed floors are in one direction)

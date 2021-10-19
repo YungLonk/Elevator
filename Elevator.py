@@ -4,11 +4,10 @@
 #     4 seconds to open door
 #     +5 seconds before closing the doors by typing 'hold door' (after hitting ctrl + c) (yet to attempt)
 #
-# Can prematurely close door during 10 second wait time by typing "close door" after requesting floor 
-# There are 5 floors in this building. 
-# Elevator will make stops at other floors if elevator requested at those floors - depending on direction of travel
+# 5-floor building
+# stops at other floors if elevator requested at those floors - depending on direction of travel
 # All processing functions (except closestFloor and areOppositeDirections) return currentFloor
-#     to keep the elevator from resetting to 1st floor
+#     to keep elevator from resetting to 1st floor
 
 # Modules
 from HelperFunctions import *
@@ -17,8 +16,8 @@ from time import sleep
 # ----------------------------- Processing Functions ----------------------------- #
 # Checks for floors in opposite directions relative to currentFloor; returns false or true
 def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
-    if len(floorsNeeded) == 0: # 2 floors contrasted
-        # Describe position of a floor relative to currentFloor #
+    if len(floorsNeeded) == 0: # 2 floors
+        # Describe position of floor relative to currentFloor #
         current1Dif = currentFloor - floorNeeded # Current floor above first floor needed
         current2Dif = currentFloor - floorNeeded2 # Current floor above second floor needed
         below1 = current1Dif < 0
