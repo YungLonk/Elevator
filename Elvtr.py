@@ -1,5 +1,4 @@
 # Modules
-from re import search
 from HelperFunctions import *
 
 class Elvtr:
@@ -462,6 +461,7 @@ class Elvtr:
                         elif twoCurrNext: # floorNeeded2 is 2nd farthest
                             return (floorNeeded4, floorNeeded3, floorNeeded2, floorNeeded)
 
+    # Sets proper order of operations for execution; calls execute
     def efficient(self, currentFloor, floorNeeded, floorNeeded2, *floorsNeeded):
         if len(floorsNeeded) == 0: # 2 floor requests
             closest = self.closestFloor(currentFloor, floorNeeded, floorNeeded2)
@@ -474,7 +474,7 @@ class Elvtr:
             currentFloor = self.execute(currentFloor, closest[0], closest[1], closest[2], closest[3])
         return currentFloor
     
-    # Opens and closes door for elevator; calls switchingFloors to move elevator
+    # Executes the proper order of operations; calls switchingFloors to move elevator
     def execute(self, currentFloor, floorNeeded, *floorsNeeded):
         closeDoor()
         currentFloor = self.switchingFloors(currentFloor, floorNeeded)
@@ -485,7 +485,6 @@ class Elvtr:
                 currentFloor = self.switchingFloors(currentFloor, floor)
                 openDoor(currentFloor)
         return currentFloor
-    
 
     # Moves elevator up or down; changes currentFloor
     def switchingFloors(self, currentFloor, floorNeeded):
