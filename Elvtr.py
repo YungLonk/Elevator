@@ -499,10 +499,7 @@ class Elvtr:
                 currentFloor -= 1
         return currentFloor
         
-    """
-    Sends floor request. Either runs execute function directly (if floors are in opposite directions)
-       or runs efficient function (if all needed floors are in one direction)
-    """
+    # Determines whether or not order of floor stops must be altered
     def floorReq(self, currentFloor, floorNeeded, *floorsNeeded):
         if len(floorsNeeded) == 0: # 1 floor request
             currentFloor = self.execute(currentFloor, floorNeeded)
