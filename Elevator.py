@@ -5,7 +5,7 @@
 #     +5 seconds before closing the doors by typing 'hold door' (after hitting ctrl + c) (yet to attempt)
 #
 # 5-floor building
-# stops at other floors if elevator requested at those floors - depending on direction of travel
+# Stops at other floors if elevator requested at those floors - depending on direction of travel
 # All processing functions (except closestFloor and areOppositeDirections) return currentFloor
 #     to keep elevator from resetting to 1st floor
 
