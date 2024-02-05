@@ -541,7 +541,7 @@ def main():
             continue
         else: # Receive input and proceede
             # Variables
-            floor2, floor3, floor4 = None # Initiate next inputs to NoneValue...
+            floor2, floor3, floor4 = "" # Initiate next inputs to NoneValue...
             floors = [floor, floor2, floor3, floor4] # ...and make them iterable
             intFloors = []
 
