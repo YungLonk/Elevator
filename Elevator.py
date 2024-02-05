@@ -545,7 +545,7 @@ def main():
             floors = [floor, floor2, floor3, floor4] # ...and make them iterable
             intFloors = []
 
-            for floor in floors: # Receive input and change variable from NoneValue to empty string
+            for floor in floors: # Receive input and validate
                 floor = input("Which floor do you need? (hit enter if all floors requested): ")
                 while floor == 'quit':
                     print("You already requested a floor. You must enter more now")
