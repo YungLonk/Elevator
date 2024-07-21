@@ -470,7 +470,7 @@ def switchingFloors(currentFloor, floorNeeded):
             currentFloor -= 1
     return currentFloor
 
-# Makes elevator move
+# Makes elevator move; passes along currentFloor
 def execute(currentFloor, floorNeeded, *floorsNeeded):
     # Always at least one floor
     closeDoor()
