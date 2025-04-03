@@ -68,7 +68,6 @@ def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, *floorsNeeded
         above3 = current3Dif > 0
         below4 = current4Dif < 0
         above4 = current4Dif > 0
-
         # 4-floor-request scenario possible outcomes (a = Above; b = Below)
         b1B2B3A4 = below1 and below2 and below3 and above4
         b1B2A3B4 = below1 and below2 and above3 and below4
@@ -84,7 +83,6 @@ def areOppositeDirections(currentFloor, floorNeeded, floorNeeded2, *floorsNeeded
         a1B2A3A4 = above1 and below2 and above3 and above4
         a1A2B3A4 = above1 and above2 and below3 and above4
         a1A2A3B4 = above1 and above2 and above3 and below4
-
         # Conditional statement
         allInLinePt1 = (not b1B2B3A4) and (not b1B2A3B4) and (not b1A2B3B4) and (not a1B2B3B4)
         allInLinePt2 = (not b1B2A3A4) and (not b1A2A3B4) and (not a1A2B3B4)
